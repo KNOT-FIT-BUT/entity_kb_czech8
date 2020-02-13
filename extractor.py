@@ -1,6 +1,5 @@
 from utils import *
 
-from wikiparser import read_pages, Page
 from wikiparser import *
 
 #  EVENT (prefix: e)
@@ -16,7 +15,12 @@ from wikiparser import *
 #  + CANCELLED
 #  + LOCATION
 #  + ORGANIZATION TYPE
-dataset = ""
+dataset = "../cswiki-latest-pages-articles.xml"
+kb_schema = []
+with open("HEAD-KB", "r") as file:
+    kb_schema = file.read().split("\n")
+
+event_matcher = SchemaMatcher("e", kb_schema[-2], "output/")
 
 
 def dump_page(title):
@@ -33,23 +37,18 @@ def load_page(title):
 
 for page in read_pages(dataset):
     p = Page(page)
-
     if p.invalid:
         continue
+    # print(p)
+    event_matcher.create_row(p)
+    continue
 
-    if ":" in p.title:
-        input(p)
-
-    try:
-        at = p.get_attributes(all_attributes)
-    except Exception:
-        pass
-        # print(p)
 
     if is_event(at):
         print(f"Event - {p}")
     elif is_organization(at):
-        print(f"Organization - {p}")
+        pass
+        # print(f"Organization - {p}")
     else:
         pass
         # input(f"{yellow(str(p))}")
