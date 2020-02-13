@@ -53,7 +53,6 @@ for page in read_pages(dataset):
     org_matcher.create_row(p)
     continue
 
-
     if is_event(at):
         print(f"Event - {p}")
     elif is_organization(at):

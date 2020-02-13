@@ -3,10 +3,18 @@ import xml.etree.ElementTree as ET
 from pprint import pprint
 import dateparser
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 
 def get_cs_date(text):
     return dateparser.parse(text, languages=["cs"])
+
+
+
+def get_attr(infobox, item):
+    for val in infobox.params:
+        if item in val.name.lower().strip():
+            return val
 
 
 # Infobox attrbiutes
@@ -14,11 +22,11 @@ def get_cs_date(text):
 def location(infobox):
     locations = []
     for item in ["místo"]:
-        if not infobox.has(item):
-            continue
+        item = get_attr(infobox, item)
 
-        for val in infobox.get(item).value.ifilter_text():
+        for val in item.value.ifilter_text():
             if val.strip() not in ' \n\t,':
+                input(locations)
                 locations.append(val)
     
     return locations
@@ -26,10 +34,9 @@ def location(infobox):
 
 def place(infobox):
     for item in ["sídlo"]:
-        if not infobox.has(item):
-            continue
+        item = get_attr(infobox, item)
 
-        for val in infobox.get(item).value.ifilter_text():
+        for val in item.value.ifilter_text():
             if val.strip() not in ' \n\t,':
                 return val
 
@@ -55,21 +62,19 @@ def end_date(infobox):
 
 
 def founded(infobox):
-    for item in ["datum založení", "Vznik"]:
-        if not infobox.has(item):
-            continue
+    for item in ["datum založení", "vznik"]:
+        item = get_attr(infobox, item)
 
-        founded = infobox.get(item).value.filter_text()
+        founded = item.value.filter_text()
         founded = "".join(map(str, founded))
         return get_cs_date(founded)
 
 
 def cancelled(infobox):
         for item in ["datum rozpuštění", "zánik"]:
-            if not infobox.has(item):
-                continue
+            item = get_attr(infobox, item)
 
-            founded = infobox.get(item).value.filter_text()
+            founded = item.value.filter_text()
             founded = "".join(map(str, founded))
             return get_cs_date(founded)
 
@@ -150,7 +155,6 @@ class SchemaMatcher:
         if any(values.values()):
             print(page.title)
             print(self.format_row(values))
-            input()
             # self._output_file.write(self.format_row(values))
 
 
@@ -166,11 +170,12 @@ class Page:
         if not self._text:
             self._text = ""
         self._text = html.unescape(self._text)
+        self._text = BeautifulSoup(self._text, features="html.parser").get_text()
 
         self._infobox = None
 
         try:
-            parsed_source = mw.parse(self._text)
+            parsed_source = mw.parse(self._text, skip_style_tags=True)
             for template in parsed_source.ifilter_templates():
                 if "Infobox" in template.name:
                     self._infobox = template
