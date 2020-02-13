@@ -21,6 +21,7 @@ with open("HEAD-KB", "r") as file:
     kb_schema = file.read().split("\n")
 
 event_matcher = SchemaMatcher("e", kb_schema[-2], "output/")
+org_matcher = SchemaMatcher("o", kb_schema[-1], "output/")
 
 
 def dump_page(title):
@@ -32,15 +33,24 @@ def dump_page(title):
 
 def load_page(title):
     with open(f'samples/{title.replace(" ", "_")}.xml', "r") as file:
+        return file.read()
         return Page(file.read())
+
+# dump_page("Národně socialistická německá dělnická strana")
+# page = load_page("Národně socialistická německá dělnická strana")
+# p = Page(page)
+# event_matcher.create_row(p)
+
 
 
 for page in read_pages(dataset):
     p = Page(page)
+
     if p.invalid:
         continue
-    # print(p)
+
     event_matcher.create_row(p)
+    org_matcher.create_row(p)
     continue
 
 
