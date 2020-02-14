@@ -10,73 +10,34 @@ def get_cs_date(text):
     return dateparser.parse(text, languages=["cs"])
 
 
-
-def get_attr(infobox, item):
-    for val in infobox.params:
-        if item in val.name.lower().strip():
-            return val
-
-
 # Infobox attrbiutes
 
 def location(infobox):
-    locations = []
-    for item in ["místo"]:
-        item = get_attr(infobox, item)
-
-        for val in item.value.ifilter_text():
-            if val.strip() not in ' \n\t,':
-                input(locations)
-                locations.append(val)
-    
-    return locations
+    pass
 
 
 def place(infobox):
-    for item in ["sídlo"]:
-        item = get_attr(infobox, item)
-
-        for val in item.value.ifilter_text():
-            if val.strip() not in ' \n\t,':
-                return val
+    pass
 
 
 def duration(infobox):
-    for item in ["trvání"]:
-        if not infobox.has(item):
-            continue
-
-        text = infobox.get(item).value
-        start, end = text.strip().split("–")
-        start = get_cs_date(start)
-        end = get_cs_date(end)
-        return {"start": start, "end": end}
+    pass
 
 
 def start_date(infobox):
-    return duration(infobox)["start"]
+    pass
 
 
 def end_date(infobox):
-    return duration(infobox)["end"]
+    pass
 
 
 def founded(infobox):
-    for item in ["datum založení", "vznik"]:
-        item = get_attr(infobox, item)
-
-        founded = item.value.filter_text()
-        founded = "".join(map(str, founded))
-        return get_cs_date(founded)
+    pass
 
 
 def cancelled(infobox):
-        for item in ["datum rozpuštění", "zánik"]:
-            item = get_attr(infobox, item)
-
-            founded = item.value.filter_text()
-            founded = "".join(map(str, founded))
-            return get_cs_date(founded)
+    pass
 
 
 EXTRACTORS = {
@@ -103,6 +64,10 @@ def filtered_title(title):
 
 import mwparserfromhell as mw
 import html
+import telegram.ext.regexhandler
+import re
+
+tags = re.compile(r"<!--[^<>]*-->|<br ?\/>")
 
 
 class SchemaMatcher:
@@ -140,6 +105,14 @@ class SchemaMatcher:
         return row
 
     def create_row(self, page):
+        if not page.infobox:
+            return
+        print(page.title)
+        print(page.infobox)
+        # self._text = tags.sub(self._text, "")
+        input()
+        return
+
         infobox = page.infobox
         if not infobox:
             return
@@ -170,7 +143,6 @@ class Page:
         if not self._text:
             self._text = ""
         self._text = html.unescape(self._text)
-        self._text = BeautifulSoup(self._text, features="html.parser").get_text()
 
         self._infobox = None
 

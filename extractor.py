@@ -40,6 +40,7 @@ def load_page(title):
 # page = load_page("Národně socialistická německá dělnická strana")
 # p = Page(page)
 # event_matcher.create_row(p)
+# exit()
 
 
 
@@ -49,7 +50,7 @@ for page in read_pages(dataset):
     if p.invalid:
         continue
 
-    event_matcher.create_row(p)
+    # event_matcher.create_row(p)
     org_matcher.create_row(p)
     continue
 
