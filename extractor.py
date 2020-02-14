@@ -37,11 +37,10 @@ def load_page(title):
         return Page(file.read())
 
 # dump_page("Národně socialistická německá dělnická strana")
-# page = load_page("Národně socialistická německá dělnická strana")
-# p = Page(page)
-# event_matcher.create_row(p)
-# exit()
-
+page = load_page("Národně socialistická německá dělnická strana")
+p = Page(page)
+event_matcher.create_row(p)
+exit()
 
 
 for page in read_pages(dataset):

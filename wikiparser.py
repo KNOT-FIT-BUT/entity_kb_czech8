@@ -67,7 +67,9 @@ import html
 import telegram.ext.regexhandler
 import re
 
-tags = re.compile(r"<!--[^<>]*-->|<br ?\/>")
+comment = re.compile(r"<!--[^<>]*-->|")
+br = re.compile(f"<br ?\/>")
+small = re.compile(f"<\/?small>")
 
 
 class SchemaMatcher:
@@ -107,8 +109,14 @@ class SchemaMatcher:
     def create_row(self, page):
         if not page.infobox:
             return
+        infobox = page.infobox
         print(page.title)
-        print(page.infobox)
+        for param in infobox.params:
+            name = param.name.strip()
+            val = param.value.strip()
+            val = br.sub("\n", val)
+            val = small.sub("", val)
+            input(f"<{name}> <{val}>")
         # self._text = tags.sub(self._text, "")
         input()
         return
