@@ -31,4 +31,7 @@ def load_page(title):
 
 for page in get_pages_by_title(dataset, ["Praha"]):
     print(page)
-    input(page.link)
+
+
+for page in get_pages_by_index(dataset, range(100)):
+    print(page)

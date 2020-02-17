@@ -53,7 +53,18 @@ EXTRACTORS = {
 # Article type matchers
 
 filtered = ("Wikipedie:", "Kategorie:", "Nápověda:", "(rozcestník)", "Seznam",
-            "MediaWiki:", "Šablona", "Portál:", "Soubor:", "Rejstřík:")
+            "MediaWiki:", "Šablona", "Portál:", "Soubor:", "Rejstřík:", "Hlavní strana")
+
+
+def filter_titles(filtered):
+    def wrapper(page_generator):
+        def arg_wrapper(*args, **kwargs):
+            for page in page_generator(*args, **kwargs):
+                if not filtered_title(page.title):
+                    yield page
+        return arg_wrapper
+    return wrapper
+
 
 def filtered_title(title):
     for f in filtered:
@@ -145,9 +156,6 @@ class Page:
         self.page_id = int(self._xml.find(".//id").text)
         self.title = self._xml.find(".//title").text
         self.link = f"https://cs.wikipedia.org/wiki/{self.title}"
-        self.invalid = filtered_title(self.title)
-        if self.invalid:
-            return
         self._text = self._xml.find(".//text").text
         if not self._text:
             self._text = ""
@@ -170,7 +178,6 @@ class Page:
 
     def __str__(self):
         return f"<{self.title}>"
-
 
 
 def get_pages_title_regex(filename, pattern):
@@ -203,6 +210,7 @@ def get_pages_by_title(filename, page_titles):
             yield page
 
 
+@filter_titles(filtered)
 def get_pages(filename):
     for page in iter_pages(filename):
         yield Page(page)
