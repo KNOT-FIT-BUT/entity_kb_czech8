@@ -1,6 +1,6 @@
 from utils import *
 
-from wikiparser import read_pages, Page
+from wikiparser import get_pages, Page
 from wikiparser import *
 
 #  EVENT (prefix: e)
@@ -16,11 +16,11 @@ from wikiparser import *
 #  + CANCELLED
 #  + LOCATION
 #  + ORGANIZATION TYPE
-dataset = ""
+dataset = "../cswiki-latest-pages-articles.xml"
 
 
 def dump_page(title):
-    for page in read_pages(dataset):
+    for page in get_pages(dataset):
         if Page(page).title == title:
             with open("samples/" + title.replace(" ", "_") + ".xml", "w") as file:
                 file.write(page)
@@ -31,25 +31,6 @@ def load_page(title):
         return Page(file.read())
 
 
-for page in read_pages(dataset):
-    p = Page(page)
-
-    if p.invalid:
-        continue
-
-    if ":" in p.title:
-        input(p)
-
-    try:
-        at = p.get_attributes(all_attributes)
-    except Exception:
-        pass
-        # print(p)
-
-    if is_event(at):
-        print(f"Event - {p}")
-    elif is_organization(at):
-        print(f"Organization - {p}")
-    else:
-        pass
-        # input(f"{yellow(str(p))}")
+for page in get_pages_by_title(dataset, ["Praha"]):
+    print(page)
+    input(page.link)

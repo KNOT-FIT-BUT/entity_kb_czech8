@@ -106,6 +106,7 @@ class Page:
         self._xml = ET.fromstring(article_text)
         self.page_id = int(self._xml.find(".//id").text)
         self.title = self._xml.find(".//title").text
+        self.link = f"https://cs.wikipedia.org/wiki/{self.title}"
         self.invalid = filtered_title(self.title)
         if self.invalid:
             return
@@ -167,7 +168,43 @@ class Page:
         return f"<{self.title}>"
 
 
-def read_pages(filename):
+
+def get_pages_title_regex(filename, pattern):
+    for page in get_pages(filename):
+        if re.match(pattern, page.title):
+            print(page)
+            yield page
+
+
+def get_pages_by_index(filename, indexes):
+    if isinstance(indexes, range):
+        indexes = list(indexes)
+
+    for index, page in enumerate(get_pages(filename)):
+        if not indexes:
+            break
+
+        if index in indexes:
+            indexes.pop(indexes.index(index))
+            yield page
+
+
+def get_pages_by_title(filename, page_titles):
+    for page in get_pages(filename):
+        if not page_titles:
+            break
+
+        if page.title in page_titles:
+            page_titles.pop(page_titles.index(page.title))
+            yield page
+
+
+def get_pages(filename):
+    for page in iter_pages(filename):
+        yield Page(page)
+
+
+def iter_pages(filename):
     article = ""
 
     for line in readlines(filename):
