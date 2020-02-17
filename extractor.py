@@ -1,6 +1,5 @@
 from utils import *
 
-from wikiparser import get_pages, Page
 from wikiparser import *
 
 #  EVENT (prefix: e)
@@ -20,10 +19,9 @@ dataset = "../cswiki-latest-pages-articles.xml"
 
 
 def dump_page(title):
-    for page in get_pages(dataset):
-        if Page(page).title == title:
-            with open("samples/" + title.replace(" ", "_") + ".xml", "w") as file:
-                file.write(page)
+    with open("samples/" + title.replace(" ", "_") + ".xml", "w") as file:
+        page = list(get_pages_by_title(dataset, title))[0]
+        file.write(page)
 
 
 def load_page(title):
