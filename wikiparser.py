@@ -150,6 +150,17 @@ class SchemaMatcher:
             # self._output_file.write(self.format_row(values))
 
 
+class Infobox:
+    def __init__(self, infobox):
+        self._infobox = infobox
+
+        self._attrs = {}
+        for param in self._infobox.params:
+            self._attrs[str(param.name).strip()] = str(param.value).strip()
+        print(self._attrs)
+        input("\n")
+
+
 class Page:
     def __init__(self, article_text):
         self._xml = ET.fromstring(article_text)
@@ -167,7 +178,7 @@ class Page:
             parsed_source = mw.parse(self._text, skip_style_tags=True)
             for template in parsed_source.ifilter_templates():
                 if "Infobox" in template.name:
-                    self._infobox = template
+                    self._infobox = Infobox(template)
                     break
         except IndexError:
             pass
