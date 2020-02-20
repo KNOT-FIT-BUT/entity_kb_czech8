@@ -75,7 +75,6 @@ def filtered_title(title):
 
 import mwparserfromhell as mw
 import html
-import telegram.ext.regexhandler
 import re
 
 comment = re.compile(r"<!--[^<>]*-->|")
@@ -156,13 +155,19 @@ class Infobox:
 
         self._attrs = {}
         for param in self._infobox.params:
-            self._attrs[str(param.name).strip()] = str(param.value).strip()
-        print(self._attrs)
-        input("\n")
+            name = str(param.name).strip()
+            value = str(param.value).strip()
+            value = comment.sub(value, "")
+            self._attrs[name] = value
+    
+    @property
+    def attrs(self):
+        return self._attrs
 
 
 class Page:
     def __init__(self, article_text):
+        self._raw_text = article_text
         self._xml = ET.fromstring(article_text)
         self.page_id = int(self._xml.find(".//id").text)
         self.title = self._xml.find(".//title").text
@@ -183,6 +188,10 @@ class Page:
         except IndexError:
             pass
 
+    @property
+    def raw(self):
+        return self._raw_text
+        
     @property
     def infobox(self):
         return self._infobox
